@@ -1,0 +1,32 @@
+{
+  "name": "redact-clone",
+  "version": "0.1.0",
+  "description": "Small library for cloning an object and redacting secret values.",
+  "main": "build/RedactClone.js",
+  "scripts": {
+    "build": "tsc",
+    "test": "nyc ./node_modules/.bin/_mocha 'test/**/*.test.ts'"
+  },
+  "keywords": [
+    "redact",
+    "clone",
+    "censor"
+  ],
+  "author": "Moojig Battsogt",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/chai": "^4.3.0",
+    "@types/traverse": "^0.6.32",
+    "mocha": "^9.2.0",
+    "prettier": "^2.5.1",
+    "ts-node": "^10.4.0",
+    "typescript": "^4.5.4",
+    "@testdeck/mocha": "^0.2.0",
+    "chai": "^4.3.6",
+    "nyc": "^15.1.0",
+    "ts-mockito": "^2.6.1"
+  },
+  "dependencies": {
+    "traverse": "^0.6.6"
+  }
+}
