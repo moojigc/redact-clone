@@ -2,9 +2,11 @@
   "name": "redact-clone",
   "version": "0.1.0",
   "description": "Small library for cloning an object and redacting secret values.",
-  "main": "build/RedactClone.js",
+  "main": "libn/RedactClone.js",
   "scripts": {
     "build": "tsc",
+    "prepare": "npm run build",
+    "prepublishOnly": "npm test",
     "test": "nyc ./node_modules/.bin/_mocha 'test/**/*.test.ts'"
   },
   "keywords": [
