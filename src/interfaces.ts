@@ -3,6 +3,10 @@ export interface RedactCloneOptions {
 	/**
 	 * @default "[REDACTED]"
 	 */
-	redact: string;
-	reduceArrays: boolean;
+	redact:
+		| string
+		| ((
+				node: [string | number | symbol | undefined, any]
+		  ) => string | number | boolean);
+	reduceArrays: boolean | ((arr: any[]) => number | string);
 }

@@ -39,8 +39,9 @@ export default class RedactClone {
 		Object.assign(this, options || {});
 	}
 
-	reduceArrays = RedactClone.defaults.reduceArrays;
-	redact = RedactClone.defaults.redact;
+	reduceArrays: RedactCloneOptions['reduceArrays'] =
+		RedactClone.defaults.reduceArrays;
+	redact: RedactCloneOptions['redact'] = RedactClone.defaults.redact;
 	set secrets(v: string[] | Set<string>) {
 		if (v instanceof Set) {
 			this._secrets = v;
@@ -59,10 +60,22 @@ export default class RedactClone {
 				return ((redactClone: RedactClone) =>
 					traverse.map(object, function (v) {
 						if (redactClone.isSecret(this.key)) {
-							this.update(redactClone.redact);
+							switch (typeof redactClone.redact) {
+								case 'string':
+									this.update(redactClone.redact);
+									break;
+								case 'function':
+									this.update(redactClone.redact([this.key, v]));
+							}
 						}
 						if (v instanceof Array && redactClone.reduceArrays) {
-							this.update(v.length);
+							switch (typeof redactClone.reduceArrays) {
+								case 'boolean':
+									this.update(`Array[${v.length}]`);
+									break;
+								case 'function':
+									this.update(redactClone.reduceArrays(v));
+							}
 						}
 					}))(this);
 			default:
