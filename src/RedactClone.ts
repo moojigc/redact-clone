@@ -1,14 +1,8 @@
-import traverse = require('traverse');
-import { defaults } from './defaults';
+import type { RedactCloneOptions } from './interfaces';
 
-interface RedactCloneOptions {
-	secrets: string[];
-	/**
-	 * @default "[REDACTED]"
-	 */
-	redact: string;
-	reduceArrays: boolean;
-}
+import traverse = require('traverse');
+
+import { defaults } from './defaults';
 
 /**
  * @example
@@ -18,7 +12,7 @@ interface RedactCloneOptions {
  * 	username: 'moojig',
  * 	password: 'DefinitelyNotMyRealPassword'
  * };
- * // logs: { username: 'moojig', password: '[SHH!]' }
+ * // logs: { username: 'moojig', password: '[SHH!]' }`
  * console.log(redactor.censor(someInput));
  * // Makes deep clone so the original object is unmodified
  * // logs: { username: 'moojig', password: 'DefinitelyNotMyRealPassword' }
