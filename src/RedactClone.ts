@@ -4,6 +4,21 @@ import traverse = require('traverse');
 
 import { defaults } from './defaults';
 
+class Set<T extends string | number | symbol> {
+	constructor(public arr: T[]) {
+		this._map = {} as Record<T, 1>;
+		for (const i of arr) {
+			this._map[i] = 1;
+		}
+	}
+
+	has(key: string) {
+		return key in this._map;
+	}
+
+	private _map: Record<T, 1>;
+}
+
 /**
  * @example
  * ```ts
@@ -36,21 +51,20 @@ export default class RedactClone {
 	}
 
 	constructor(options?: Partial<RedactCloneOptions>) {
-		Object.assign(this, options || {});
+		for (const k in options || {}) {
+			// @ts-ignore
+			this[k] = options[k];
+		}
 	}
 
 	reduceArrays: RedactCloneOptions['reduceArrays'] =
 		RedactClone.defaults.reduceArrays;
 	redact: RedactCloneOptions['redact'] = RedactClone.defaults.redact;
-	set secrets(v: string[] | Set<string>) {
-		if (v instanceof Set) {
-			this._secrets = v;
-		} else {
-			this._secrets = new Set(v);
-		}
+	set secrets(v: string[]) {
+		this._secrets = new Set(v);
 	}
-	get secrets(): Set<string> {
-		return this._secrets;
+	get secrets(): string[] {
+		return this._secrets.arr;
 	}
 	private _secrets = new Set(RedactClone.defaults.secrets);
 
@@ -84,6 +98,6 @@ export default class RedactClone {
 	}
 
 	isSecret(key?: string) {
-		return key ? this.secrets.has(key) : false;
+		return key ? this._secrets.has(key) : false;
 	}
 }

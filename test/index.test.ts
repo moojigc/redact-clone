@@ -28,9 +28,7 @@ class RedactCloneTests {
 		this.SUT2.redact.should.be.equal(this.CENSOR);
 		this.SUT3.redact.should.be.equal(RedactClone.defaults.redact);
 		this.SUT.reduceArrays.should.equal(RedactClone.defaults.reduceArrays);
-		this.SUT.secrets.should.be.deep.equal(
-			new Set(RedactClone.defaults.secrets)
-		);
+		this.SUT.secrets.should.be.deep.equal(RedactClone.defaults.secrets);
 		this.SUT.should.haveOwnProperty('redact');
 		this.SUT.isSecret('secret').should.equal(true);
 	}
@@ -39,9 +37,7 @@ class RedactCloneTests {
 	'secret setter should work'() {
 		const arr = ['password', 'token'];
 		this.SUT.secrets = arr;
-		this.SUT.secrets.should.be.deep.equal(new Set(arr));
-		this.SUT.secrets = new Set(arr);
-		this.SUT.secrets.should.be.deep.equal(new Set(arr));
+		this.SUT.secrets.should.be.deep.equal(arr);
 		this.SUT.secrets = RedactClone.defaults.secrets;
 	}
 
