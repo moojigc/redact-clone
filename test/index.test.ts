@@ -1,7 +1,7 @@
 import { suite, test } from '@testdeck/mocha';
 import * as _chai from 'chai';
 
-import RedactClone from '../src/RedactClone';
+import RedactClone from '../src';
 
 _chai.should();
 @suite

@@ -19,7 +19,7 @@ import { defaults } from './defaults';
  * console.log(someInput)
  * ```
  */
-export default class RedactClone {
+export class RedactClone {
 	static defaults = defaults;
 	/**
 	 * Create a RedactClone instance
