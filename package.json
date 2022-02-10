@@ -1,6 +1,6 @@
 {
-  "name": "redact-clone",
-  "version": "0.1.0",
+  "name": "redact-clonejs",
+  "version": "0.2.0",
   "description": "Small library for cloning an object and redacting secret values.",
   "main": "lib/index.js",
   "scripts": {

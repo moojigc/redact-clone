@@ -67,7 +67,12 @@ export class RedactClone {
 						if (v instanceof Array && redactClone.reduceArrays) {
 							switch (typeof redactClone.reduceArrays) {
 								case 'boolean':
-									this.update(`Array[${v.length}]`);
+									this.update(redactClone._reduceArray(v));
+									break;
+								case 'number':
+									if (v.length > redactClone.reduceArrays) {
+										this.update(redactClone._reduceArray(v));
+									}
 									break;
 								case 'function':
 									this.update(redactClone.reduceArrays(v));
@@ -77,6 +82,10 @@ export class RedactClone {
 			default:
 				return this.redact;
 		}
+	}
+
+	private _reduceArray(arr: any[]) {
+		return `[Object ARRAY[${arr.length}]]`;
 	}
 
 	isSecret(key?: string) {

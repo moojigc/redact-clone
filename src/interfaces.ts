@@ -8,5 +8,8 @@ export interface RedactCloneOptions {
 		| ((
 				node: [string | number | symbol | undefined, any]
 		  ) => string | number | boolean);
-	reduceArrays: boolean | ((arr: any[]) => number | string);
+	/**
+	 * If number, reduce when array length is greater
+	 */
+	reduceArrays: boolean | number | ((arr: any[]) => number | string);
 }

@@ -154,7 +154,27 @@ class RedactCloneTests {
 			},
 		];
 		this.SUT.reduceArrays = true;
-		this.SUT.censor(arr).should.be.equal(`Array[1]`);
+		this.SUT.censor(arr).should.be.equal(`[Object ARRAY[1]]`);
 		this.SUT2.censor(arr).should.be.equal('ARR[1]');
+	}
+
+	@test
+	'should reduce arrays when reduceArray is number'() {
+		const arr = [
+			{
+				user: 'bruh',
+			},
+		];
+		const arr2 = [
+			{
+				user: 'bruh',
+			},
+			{
+				user: 'bruh',
+			},
+		];
+		this.SUT.reduceArrays = 1;
+		this.SUT.censor(arr).should.be.deep.equal(arr);
+		this.SUT.censor(arr2).should.be.equal('[Object ARRAY[2]]');
 	}
 }
