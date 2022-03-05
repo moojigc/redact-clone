@@ -1,4 +1,6 @@
-export const defaults = {
+import type { RedactCloneOptions } from './interfaces';
+
+export const defaults: RedactCloneOptions = {
 	secrets: [
 		'password',
 		'pass',

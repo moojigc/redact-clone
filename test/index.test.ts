@@ -7,9 +7,10 @@ _chai.should();
 @suite
 class RedactCloneTests {
 	CENSOR = 'SHH!';
-	private SUT: RedactClone;
-	private SUT2: RedactClone;
-	private SUT3: RedactClone;
+	SUT: RedactClone;
+	SUT2: RedactClone;
+	SUT3: RedactClone;
+	SUT4: RedactClone;
 
 	before() {
 		this.SUT = RedactClone.create(this.CENSOR);
@@ -19,6 +20,9 @@ class RedactCloneTests {
 			secrets: ['password', 'secrets'],
 		});
 		this.SUT3 = RedactClone.create();
+		this.SUT4 = RedactClone.create({
+			secrets: ['user', /token/i],
+		});
 	}
 
 	@test
@@ -44,7 +48,7 @@ class RedactCloneTests {
 	@test
 	'should censor plain string'() {
 		for (const str of RedactClone.defaults.secrets) {
-			this.SUT.isSecret(str).should.be.eq(true);
+			this.SUT.isSecret(str as string).should.be.eq(true);
 			this.SUT.censor(str).should.be.equal(this.CENSOR);
 		}
 	}
@@ -162,19 +166,61 @@ class RedactCloneTests {
 	'should reduce arrays when reduceArray is number'() {
 		const arr = [
 			{
+				id: 1,
 				user: 'bruh',
 			},
 		];
 		const arr2 = [
 			{
+				id: 1,
 				user: 'bruh',
 			},
 			{
+				id: 2,
 				user: 'bruh',
 			},
 		];
 		this.SUT.reduceArrays = 1;
 		this.SUT.censor(arr).should.be.deep.equal(arr);
-		this.SUT.censor(arr2).should.be.equal('[Object ARRAY[2]]');
+		this.SUT.censor(arr2).should.be.deep.equal([
+			...arr,
+			'...[Object ARRAY[2]]',
+		]);
+	}
+
+	@test
+	'should use different isSecret method when RegExp is passed into secrets option'() {
+		const obj = {
+			accessToken: 'the_most_random_access_token_ever123',
+			userId: 123,
+		};
+
+		this.SUT4.censor(obj).should.be.deep.equal({
+			accessToken: '[REDACT]',
+			userId: 123,
+		});
+	}
+
+	@test
+	'replacing defaults should replace them for every new instance'() {
+		RedactClone.defaults.redact = '🤫';
+		RedactClone.defaults.secrets = ['password', /ssn/];
+		const newInstance = RedactClone.create();
+		const newInstance2 = RedactClone.create({});
+		const test = {
+			password: '123',
+			ssn: '000-00-0000',
+		};
+		const output = {
+			password: RedactClone.defaults.redact,
+			ssn: RedactClone.defaults.redact,
+		};
+		newInstance.censor(test).should.be.deep.equal(output);
+		newInstance2.censor(test).should.be.deep.equal(output);
+		RedactClone.defaults.redact = '[MIND YA OWN BUSINESS]';
+		RedactClone.create().censor(test).should.deep.equal({
+			password: RedactClone.defaults.redact,
+			ssn: RedactClone.defaults.redact,
+		});
 	}
 }

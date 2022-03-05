@@ -20,6 +20,9 @@ import { defaults } from './defaults';
  * ```
  */
 export class RedactClone {
+	/**
+	 * You can replace these and every RedactClone instance in your process will share them
+	 */
 	static defaults = defaults;
 	/**
 	 * Create a RedactClone instance
@@ -37,18 +40,35 @@ export class RedactClone {
 
 	constructor(options?: Partial<RedactCloneOptions>) {
 		Object.assign(this, options || {});
+		if (this.secrets.some((s) => s instanceof RegExp)) {
+			Object.assign(this, {
+				isSecret(this: RedactClone, key?: string) {
+					if (!key) {
+						return false;
+					}
+					return this.secrets.some((s) => {
+						if (typeof s === 'string') {
+							return s === key;
+						}
+						return s.test(key);
+					});
+				},
+			});
+		}
 	}
 
 	reduceArrays: RedactCloneOptions['reduceArrays'] =
 		RedactClone.defaults.reduceArrays;
 	redact: RedactCloneOptions['redact'] = RedactClone.defaults.redact;
-	set secrets(v: string[]) {
+	set secrets(v: Array<string | RegExp>) {
 		this._secrets = new Set(v);
 	}
-	get secrets(): string[] {
+	get secrets(): Array<string | RegExp> {
 		return [...this._secrets.values()];
 	}
-	private _secrets = new Set(RedactClone.defaults.secrets);
+	private _secrets: Set<string | RegExp> = new Set(
+		RedactClone.defaults.secrets
+	);
 
 	censor(object: any) {
 		switch (typeof object) {
@@ -65,18 +85,7 @@ export class RedactClone {
 							}
 						}
 						if (v instanceof Array && redactClone.reduceArrays) {
-							switch (typeof redactClone.reduceArrays) {
-								case 'boolean':
-									this.update(redactClone._reduceArray(v));
-									break;
-								case 'number':
-									if (v.length > redactClone.reduceArrays) {
-										this.update(redactClone._reduceArray(v));
-									}
-									break;
-								case 'function':
-									this.update(redactClone.reduceArrays(v));
-							}
+							this.update(redactClone.reduceArray(v));
 						}
 					}))(this);
 			default:
@@ -84,7 +93,30 @@ export class RedactClone {
 		}
 	}
 
-	private _reduceArray(arr: any[]) {
+	reduceArray<T>(arr: T[]): T[] | (string | T)[] | string {
+		switch (typeof this.reduceArrays) {
+			case 'boolean':
+				return this._reduce(arr);
+			case 'number':
+				if (arr.length > this.reduceArrays) {
+					const newArr: (T | string)[] = [];
+					for (let i = 0; i < arr.length; i++) {
+						if (i > this.reduceArrays - 1) {
+							newArr.push(`...${this._reduce(arr)}`);
+							break;
+						}
+						newArr.push(arr[i]);
+					}
+					return newArr;
+				} else {
+					return arr;
+				}
+			case 'function':
+				return this.reduceArrays(arr);
+		}
+	}
+
+	private _reduce(arr: any[]) {
 		return `[Object ARRAY[${arr.length}]]`;
 	}
 
